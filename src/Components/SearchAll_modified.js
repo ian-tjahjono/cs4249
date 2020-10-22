@@ -4,6 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import React from "react";
+import update from 'react-addons-update';
 import "../App.css";
 import Item from "./Item";
 // import { Spinner } from "react-bootstrap";
@@ -27,7 +28,10 @@ import CloseIcon from "@material-ui/icons/Close";
 import Skeleton from "@material-ui/lab/Skeleton";
 
 const analytics = firebase.analytics();
+
+//IV3
 const distSplit=2;
+//IV3 End
 
 function getMobileOperatingSystem() {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -132,12 +136,17 @@ export class SearchAll extends React.Component {
     super(props);
 
     const queryParams = new URLSearchParams(props.location.search);
+	this.myRef = React.createRef();
 
-    const state = {
+
+
+	//IV3
+	const state = {
       ...searchInitialState,
       pickup: queryParams.get("option") === "selfcollect",
       delivery: queryParams.get("option") === "delivery",
       open: true,
+	  showList:[],
     };
 
     if (queryParams.get("lng") && queryParams.get("lat")) {
@@ -149,8 +158,10 @@ export class SearchAll extends React.Component {
       state.postal = queryParams.get("postal");
       state.searchPostal = true;
     }
+	state.showList=new Array(20).fill(false)
 
     this.state = state;
+	//IV3 End
   }
 
   componentWillMount() {
@@ -367,6 +378,29 @@ export class SearchAll extends React.Component {
       }
     }
   };
+  
+  //IV3
+  scrollToMyRef = () => window.scrollTo(0, this.myRef.offsetTop - 60);
+  
+  wantToView = ev => {
+	let distCounter=ev.currentTarget.dataset.tag;
+    this.scrollToMyRef();
+	let toShow = [this.state.showList];
+    if (this.state.showList[distCounter]) {
+      toShow = false;
+    } else {
+      toShow = true;
+    }
+	
+	this.setState(update(this.state, {
+	  showList: {
+		[distCounter]: {
+		  $set: toShow
+		}
+	  }
+	}));
+  };
+  //IV3 End
 
   render() {
     let result = {
@@ -433,23 +467,91 @@ export class SearchAll extends React.Component {
           ).toString();
         });
 
+		//IV3: Food listing arrangement
 		let distCounter=0;
+		let size=Object.keys(filtered).length;
         filtered = filtered.sort((a, b) => a.distance - b.distance);
         result.nearby = filtered.map((data) => {
 			let division="";
+			let endDiv="";
+			let itemDiv="";
+			
+			
+			let divider = <div class="w-100"><p class="text-left" style={{ paddingLeft:"27px" }}>{distSplit*distCounter} to {distSplit*(distCounter+1)} KM Away</p><hr
+					style={{
+					  color: "grey",
+					  backgroundColor: "grey",
+					  height: "1px",
+					  borderColor: "grey",
+					  width: "100%",
+					  alignItems: "center",
+					  marginBottom: "0px", // aligns See More to divider
+					}}
+				  /></div>;
+			/* See more button shows if only customer hasn't clicked see more */
+			let hider = 
+                <div class="w-100" style={{ marginTop: "30px" }}>
+				  <hr
+					style={{
+					  color: "grey",
+					  backgroundColor: "grey",
+					  height: "1px",
+					  borderColor: "grey",
+					  width: "100%",
+					  alignItems: "center",
+					  marginBottom: "0px", // aligns See More to divider
+					}}
+				  />
+				  <div
+					style={{
+					  textAlign: "center",
+					  paddingRight: "15px",
+					  fontSize: "110%",
+					  cursor: "pointer",
+					  color: "grey",
+					}}
+					data-tag={distCounter}
+					onClick={this.wantToView}
+				  >
+					{!this.state.showList[distCounter] ? <b>see more ↓</b> : <b>see less ↑</b>}
+				  </div>
+				</div>;
 			
 			if(data["distance"]<(distSplit*distCounter)){
 				division="";
 			}
 			else
 			{
-				division= <div class="w-100"><p class="text-left" style={{ paddingLeft:"27px" }}>{distSplit*distCounter} to {distSplit*(distCounter+1)} KM Away</p><hr/></div> ;
+				
+				let difference = Math.floor(data["distance"]/distSplit) - distCounter;
+				if(difference > 0)
+				{
+					distCounter = difference;	
+				}
+
+				if(distCounter>0)
+				{
+					division=<>{hider}{divider}</>;
+				}
+				else
+				{
+					division=divider;
+				}
 				distCounter++;
+
 			}
-			  return (
-				<>
-					{division}
-					<span>
+			if(size>1)
+			{
+				size--;
+			}
+			else
+			{
+				endDiv=hider;
+			}
+			
+			if(this.state.showList[distCounter])
+			{
+				itemDiv=<span>
 					  <div>
 						<Item
 						  promo={data["promo"]}
@@ -462,12 +564,18 @@ export class SearchAll extends React.Component {
 						  claps={data["claps"]}
 						/>
 					  </div>
-					</span>			
+					</span>;
+			}
+			  return (
+				<>
+					{division}
+					{itemDiv}
+					{endDiv}					
 				</>
 			  );
 			
         });
-		
+		//IV3 End
 
       } else {
         result.nearby = filtered.map((data) => {
@@ -489,7 +597,7 @@ export class SearchAll extends React.Component {
         });
       }
     }
-
+	//IV2: Type of search pane
     return (
       <div class="container" style={{ paddingTop: "56px", width: "100%" }}>
 	  <div class=" container bg-white pt-3 pb-4 search-bar border border-light rounded">
@@ -522,6 +630,7 @@ export class SearchAll extends React.Component {
 						"border-radius": "1rem",
 					  }}
 					  onChange={this.handleChange}
+					  ref={(ref) => (this.myRef = ref)}
 					></input>
 				  </div>
 				)}
@@ -663,6 +772,8 @@ export class SearchAll extends React.Component {
 		  </div>
 	  </div>
 	  <div style={{ paddingBottom: "12em" }}></div>
+	  {/*IV2 end*/}
+	  
 	  <div class="container">  
           <div className="row justify-content-center mt-4" >
             {this.state.retrieved ? (
