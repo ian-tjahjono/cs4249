@@ -4,7 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import React from "react";
-import update from 'react-addons-update';
 import "../App.css";
 import Item from "./Item";
 // import { Spinner } from "react-bootstrap";
@@ -28,10 +27,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import Skeleton from "@material-ui/lab/Skeleton";
 
 const analytics = firebase.analytics();
-
-//IV3
-var distSplit=2;
-//IV3 End
 
 function getMobileOperatingSystem() {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -136,15 +131,12 @@ export class SearchAll extends React.Component {
     super(props);
 
     const queryParams = new URLSearchParams(props.location.search);
-	this.myRef = React.createRef();
 
-	//IV3
-	const state = {
+    const state = {
       ...searchInitialState,
       pickup: queryParams.get("option") === "selfcollect",
       delivery: queryParams.get("option") === "delivery",
       open: true,
-	  showList:[],   
     };
 
     if (queryParams.get("lng") && queryParams.get("lat")) {
@@ -156,17 +148,8 @@ export class SearchAll extends React.Component {
       state.postal = queryParams.get("postal");
       state.searchPostal = true;
     }
-      
-    if (queryParams.get("iv3") === "short") {
-        distSplit = 2;
-    } else if (queryParams.get("iv3") === "long") {
-        distSplit = 3;
-    }  
-      
-	state.showList=new Array(20).fill(false)
 
     this.state = state;
-	//IV3 End
   }
 
   componentWillMount() {
@@ -383,29 +366,6 @@ export class SearchAll extends React.Component {
       }
     }
   };
-  
-  //IV3
-  scrollToMyRef = () => window.scrollTo(0, this.myRef.offsetTop - 60);
-  
-  wantToView = ev => {
-	let distCounter=ev.currentTarget.dataset.tag;
-    this.scrollToMyRef();
-	let toShow = [this.state.showList];
-    if (this.state.showList[distCounter]) {
-      toShow = false;
-    } else {
-      toShow = true;
-    }
-	
-	this.setState(update(this.state, {
-	  showList: {
-		[distCounter]: {
-		  $set: toShow
-		}
-	  }
-	}));
-  };
-  //IV3 End
 
   render() {
     let result = {
@@ -472,116 +432,26 @@ export class SearchAll extends React.Component {
           ).toString();
         });
 
-		//IV3: Food listing arrangement
-		let distCounter=0;
-		let size=Object.keys(filtered).length;
         filtered = filtered.sort((a, b) => a.distance - b.distance);
+
         result.nearby = filtered.map((data) => {
-			let division="";
-			let endDiv="";
-			let itemDiv="";
-			
-			
-			let divider = <div class="w-100"><p class="text-left" style={{ paddingLeft:"27px" }}>{distSplit*distCounter} to {distSplit*(distCounter+1)} KM Away</p><hr
-					style={{
-					  color: "grey",
-					  backgroundColor: "grey",
-					  height: "1px",
-					  borderColor: "grey",
-					  width: "100%",
-					  alignItems: "center",
-					  marginBottom: "0px", // aligns See More to divider
-					}}
-				  /></div>;
-			/* See more button shows if only customer hasn't clicked see more */
-			let hider = 
-                <div class="w-100" style={{ marginTop: "30px" }}>
-				  <hr
-					style={{
-					  color: "grey",
-					  backgroundColor: "grey",
-					  height: "1px",
-					  borderColor: "grey",
-					  width: "100%",
-					  alignItems: "center",
-					  marginBottom: "0px", // aligns See More to divider
-					}}
-				  />
-				  <div
-					style={{
-					  textAlign: "center",
-					  paddingRight: "15px",
-					  fontSize: "110%",
-					  cursor: "pointer",
-					  color: "grey",
-					}}
-					data-tag={distCounter}
-					onClick={this.wantToView}
-				  >
-					{!this.state.showList[distCounter] ? <b>see more ↓</b> : <b>see less ↑</b>}
-				  </div>
-				</div>;
-			
-			if(data["distance"]<(distSplit*distCounter)){
-				division="";
-			}
-			else
-			{
-				
-				let difference = Math.floor(data["distance"]/distSplit) - distCounter;
-				if(difference > 0)
-				{
-					distCounter = difference;	
-				}
-
-				if(distCounter>0)
-				{
-					division=<>{hider}{divider}</>;
-				}
-				else
-				{
-					division=divider;
-				}
-				distCounter++;
-
-			}
-			if(size>1)
-			{
-				size--;
-			}
-			else
-			{
-				endDiv=hider;
-			}
-			
-			if(this.state.showList[distCounter])
-			{
-				itemDiv=<span>
-					  <div>
-						<Item
-						  promo={data["promo"]}
-						  id={data["id"]}
-						  name={data["name"]}
-						  street={data["street"]}
-						  pic={data["url"]}
-						  summary={data["description"]}
-						  distance={data["distance"]}
-						  claps={data["claps"]}
-						/>
-					  </div>
-					</span>;
-			}
-			  return (
-				<>
-					{division}
-					{itemDiv}
-					{endDiv}					
-				</>
-			  );
-			
+          return (
+            <span>
+              <div>
+                <Item
+                  promo={data["promo"]}
+                  id={data["id"]}
+                  name={data["name"]}
+                  street={data["street"]}
+                  pic={data["url"]}
+                  summary={data["description"]}
+                  distance={data["distance"]}
+                  claps={data["claps"]}
+                />
+              </div>
+            </span>
+          );
         });
-		//IV3 End
-
       } else {
         result.nearby = filtered.map((data) => {
           return (

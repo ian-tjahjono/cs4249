@@ -13,6 +13,9 @@ import Info from "./Info";
 import About from "./About";
 import Popup from "./Popup";
 import SearchAll from "./SearchAll";
+import SearchAll_modified from "./SearchAll_modified";
+import SearchAll_iv2 from "./SearchAll_iv2";
+import SearchAll_iv3 from "./SearchAll_iv3";
 import ListForm from "./ListForm";
 import ItemRendered from "./ItemRendered";
 import Driver from "./Driver";
@@ -43,6 +46,9 @@ export default {
   About,
   Popup,
   SearchAll,
+  SearchAll_modified,
+  SearchAll_iv2,
+  SearchAll_iv3,    
   ListForm,
   ItemRendered,
   Driver,

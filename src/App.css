@@ -814,6 +814,17 @@ figcaption .sub-price {
   margin: 0 0.1rem;
 }
 
+.search-bar {
+	position: fixed;
+	z-index: 2 ;
+	border-width:10px;
+}
+
+.break-column {
+  flex-basis: 100%;
+  width: 0;
+}
+
 /*==================== Message ======================*/
 #message {
   position: absolute;

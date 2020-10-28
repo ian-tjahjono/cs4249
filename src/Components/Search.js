@@ -14,10 +14,24 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 
 export class Search extends React.Component {
-  state = {
-    postal: cookies.get("postal_search"),
-    loading: false,
-  };
+//  state = {
+//      postal: cookies.get("postal_search"),
+//      loading: false,
+//  };
+    
+// Get IVs from URL
+    constructor(props) {
+        super(props);
+        
+        const queryParams = new URLSearchParams(props.location.search);
+
+        this.state = {
+            postal: cookies.get("postal_search"),
+            loading: false,
+            iv2: queryParams.get("iv2"),
+            iv3: queryParams.get("iv3"),
+        };
+    }
 
   handleChange = (event) => {
     const target = event.target;
@@ -71,12 +85,38 @@ export class Search extends React.Component {
     search.append("street", postal.ADDRESS);
     search.append("lng", postal.LONGITUDE);
     search.append("lat", postal.LATITUDE);
-    search.append("option", this.props.option);
+    search.append("option", this.props.option); 
 
+/*
     this.props.history.push({
-      pathname: "/searchall",
-      search: search.toString(),
+        pathname: "/searchall",
+        search: search.toString(),
     });
+*/
+    if (this.state.iv2 === "dynamic" && (this.state.iv3 === "short" || this.state.iv3 === "long")) {
+        search.append("iv3", this.state.iv3);       
+        this.props.history.push({
+            pathname: "/searchall_modified",
+            search: search.toString(),
+        });
+    } else if (this.state.iv2 === "dynamic" && this.state.iv3 === "none") {      
+        this.props.history.push({
+            pathname: "/searchall_iv2",
+            search: search.toString(),
+        });       
+    } else if (this.state.iv2 === "static" && (this.state.iv3 === "short" || this.state.iv3 === "long")) {   
+        search.append("iv3", this.state.iv3); 
+        this.props.history.push({
+            pathname: "/searchall_iv3",
+            search: search.toString(),
+        });
+    } else {
+        this.props.history.push({
+            pathname: "/searchall",
+            search: search.toString(),
+        });
+    }
+    
   };
 
   render() {

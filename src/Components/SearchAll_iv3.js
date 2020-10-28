@@ -602,185 +602,177 @@ export class SearchAll extends React.Component {
         });
       }
     }
-	//IV2: Type of search pane
     return (
       <div class="container" style={{ paddingTop: "56px", width: "100%" }}>
-	  <div class=" container bg-white pt-3 pb-4 search-bar border border-light rounded">
-		  <div class="row justify-content-center">
-			<LanguageContext.Consumer>
-			  {(context) => (
-				<div class="col-12 col-sm-6 col-md-6">
-				  <h3 id="back-to-top-anchor">
-					{context.data.search.alllistings}
-				  </h3>
-				</div>
-			  )}
-			</LanguageContext.Consumer>
-		  </div>
-		  <div class="row justify-content-center mt-4">
-			{
-			  <LanguageContext.Consumer>
-				{(context) => (
-				  <div class="col-12 col-sm-6 col-md-6">
-					<input
-					  disabled={!this.state.retrieved}
-					  class="form-control"
-					  type="text"
-					  // value={this.state.search}
-					  name="search"
-					  placeholder={context.data.search.prompt}
-					  style={{
-						width: "100%",
-						height: "38px",
-						"border-radius": "1rem",
-					  }}
-					  onChange={this.handleChange}
-					  ref={(ref) => (this.myRef = ref)}
-					></input>
-				  </div>
-				)}
-			  </LanguageContext.Consumer>
-			}
+        <div class="container" style={{ paddingTop: "27px" }}>
+          <div class="row justify-content-center">
+            <LanguageContext.Consumer>
+              {(context) => (
+                <div class="col-12 col-sm-6 col-md-6">
+                  <h3 id="back-to-top-anchor">
+                    {context.data.search.alllistings}
+                  </h3>
+                </div>
+              )}
+            </LanguageContext.Consumer>
+          </div>
+          <div class="row justify-content-center mt-4">
+            {
+              <LanguageContext.Consumer>
+                {(context) => (
+                  <div class="col-12 col-sm-6 col-md-6">
+                    <input
+                      disabled={!this.state.retrieved}
+                      class="form-control"
+                      type="text"
+                      // value={this.state.search}
+                      name="search"
+                      placeholder={context.data.search.prompt}
+                      style={{
+                        width: "100%",
+                        height: "38px",
+                        "border-radius": "1rem",
+                      }}
+                      onChange={this.handleChange}
+                    ></input>
+                  </div>
+                )}
+              </LanguageContext.Consumer>
+            }
 
-			<div class="col-12 col-sm-10 col-md-6">{this.cuisineSearch()}</div>
-		  </div>
-		  <div class="row justify-content-center mt-4">
-			<LanguageContext.Consumer>
-			  {(context) => (
-				<div class="col-6 col-sm-6 col-md-6">
-				  <input
-					onChange={this.handleChange}
-					value={this.state.postal}
-					type="text"
-					pattern="[0-9]{6}"
-					maxLength={6}
-					minLength={6}
-					class="form-control"
-					name="postal"
-					placeholder={context.data.search.postalcode}
-					autoComplete="postal-code"
-					autoFocus
-					required
-					disabled={!this.state.retrieved}
-					style={{
-					  width: "100%",
-					  height: "38px",
-					  "border-radius": "1rem",
-					}}
-				  ></input>
-				</div>
-			  )}
-			</LanguageContext.Consumer>
-			<div class="col-3 col-xs-3 col-sm-3 col-md-3">
-			  <div name="pickup">
-				<LanguageContext.Consumer>
-				  {(context) => (
-					<Button
-					  variant={"contained"}
-					  // variant="outline-secondary"
-					  onClick={this.handleToggle}
-					  name="pickup"
-					  disabled={!this.state.retrieved}
-					  style={
-						!this.state.pickup
-						  ? {
-							  backgroundColor: "white",
-							  borderColor: "#b48300",
-							  width: "100%",
-							  height: "38px",
-							  textTransform: "none",
-							}
-						  : {
-							  backgroundColor: "#b48300",
-							  borderColor: "#b48300",
-							  width: "100%",
-							  height: "38px",
-							  textTransform: "none",
-							}
-					  }
-					  color={"secondary"}
-					>
-					  <img
-						name="pickup"
-						src={bag}
-						alt="bag"
-						style={{ height: "20px" }}
-					  ></img>
-					  <div
-						name="pickup"
-						class="d-none d-md-inline-block"
-						style={
-						  !this.state.pickup
-							? { marginLeft: "10px", color: "black" }
-							: { marginLeft: "10px", color: "white" }
-						}
-					  >
-						{context.data.search.self_collect}
-					  </div>
-					</Button>
-				  )}
-				</LanguageContext.Consumer>
-			  </div>
-			</div>
-
-			<div class="col-3 col-xs-3 col-sm-3 col-md-3">
-			  <div name="delivery">
-				<LanguageContext.Consumer>
-				  {(context) => (
-					<Button
-					  type="submit"
-					  variant={"contained"}
-					  disabled={!this.state.retrieved}
-					  style={
-						!this.state.delivery
-						  ? {
-							  backgroundColor: "white",
-							  borderColor: "#b48300",
-							  width: "100%",
-							  height: "38px",
-							  textTransform: "none",
-							}
-						  : {
-							  backgroundColor: "#b48300",
-							  borderColor: "#b48300",
-							  width: "100%",
-							  height: "38px",
-							  textTransform: "none",
-							}
-					  }
-					  name="delivery"
-					  color={"secondary"}
-					  onClick={this.handleToggle}
-					>
-					  <img
-						name="delivery"
-						src={motor}
-						alt="motor"
-						style={{ height: "20px" }}
-					  ></img>{" "}
-					  <div
-						name="delivery"
-						class="d-none d-md-inline-block"
-						style={
-						  !this.state.delivery
-							? { marginLeft: "10px", color: "black" }
-							: { marginLeft: "10px", color: "white" }
-						}
-					  >
-						{context.data.search.delivery}
-					  </div>
-					</Button>
-				  )}
-				</LanguageContext.Consumer>
-			  </div>
-			</div>
-		  </div>
-	  </div>
-	  <div style={{ paddingBottom: "12em" }}></div>
-	  {/*IV2 end*/}
-	  
-	  <div class="container">  
-          <div className="row justify-content-center mt-4" >
+            <div class="col-12 col-sm-10 col-md-6">{this.cuisineSearch()}</div>
+          </div>
+          <div class="row justify-content-center mt-4">
+            <LanguageContext.Consumer>
+              {(context) => (
+                <div class="col-6 col-sm-6 col-md-6">
+                  <input
+                    onChange={this.handleChange}
+                    value={this.state.postal}
+                    type="text"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    minLength={6}
+                    class="form-control"
+                    name="postal"
+                    placeholder={context.data.search.postalcode}
+                    autoComplete="postal-code"
+                    autoFocus
+                    required
+                    disabled={!this.state.retrieved}
+                    style={{
+                      width: "100%",
+                      height: "38px",
+                      "border-radius": "1rem",
+                    }}
+                  ></input>
+                </div>
+              )}
+            </LanguageContext.Consumer>
+            <div class="col-3 col-xs-3 col-sm-3 col-md-3">
+              <div name="pickup">
+                <LanguageContext.Consumer>
+                  {(context) => (
+                    <Button
+                      variant={"contained"}
+                      // variant="outline-secondary"
+                      onClick={this.handleToggle}
+                      name="pickup"
+                      disabled={!this.state.retrieved}
+                      style={
+                        !this.state.pickup
+                          ? {
+                              backgroundColor: "white",
+                              borderColor: "#b48300",
+                              width: "100%",
+                              height: "38px",
+                              textTransform: "none",
+                            }
+                          : {
+                              backgroundColor: "#b48300",
+                              borderColor: "#b48300",
+                              width: "100%",
+                              height: "38px",
+                              textTransform: "none",
+                            }
+                      }
+                      color={"secondary"}
+                    >
+                      <img
+                        name="pickup"
+                        src={bag}
+                        alt="bag"
+                        style={{ height: "20px" }}
+                      ></img>
+                      <div
+                        name="pickup"
+                        class="d-none d-md-inline-block"
+                        style={
+                          !this.state.pickup
+                            ? { marginLeft: "10px", color: "black" }
+                            : { marginLeft: "10px", color: "white" }
+                        }
+                      >
+                        {context.data.search.self_collect}
+                      </div>
+                    </Button>
+                  )}
+                </LanguageContext.Consumer>
+              </div>
+            </div>
+            <div class="col-3 col-xs-3 col-sm-3 col-md-3">
+              <div name="delivery">
+                <LanguageContext.Consumer>
+                  {(context) => (
+                    <Button
+                      type="submit"
+                      variant={"contained"}
+                      disabled={!this.state.retrieved}
+                      style={
+                        !this.state.delivery
+                          ? {
+                              backgroundColor: "white",
+                              borderColor: "#b48300",
+                              width: "100%",
+                              height: "38px",
+                              textTransform: "none",
+                            }
+                          : {
+                              backgroundColor: "#b48300",
+                              borderColor: "#b48300",
+                              width: "100%",
+                              height: "38px",
+                              textTransform: "none",
+                            }
+                      }
+                      name="delivery"
+                      color={"secondary"}
+                      onClick={this.handleToggle}
+                    >
+                      <img
+                        name="delivery"
+                        src={motor}
+                        alt="motor"
+                        style={{ height: "20px" }}
+                      ></img>{" "}
+                      <div
+                        name="delivery"
+                        class="d-none d-md-inline-block"
+                        style={
+                          !this.state.delivery
+                            ? { marginLeft: "10px", color: "black" }
+                            : { marginLeft: "10px", color: "white" }
+                        }
+                      >
+                        {context.data.search.delivery}
+                      </div>
+                    </Button>
+                  )}
+                </LanguageContext.Consumer>
+              </div>
+            </div>
+          </div>
+          <div className="row justify-content-center mt-4">
             {this.state.retrieved ? (
               result.nearby.length > 0 ? (
                 result.nearby

@@ -973,6 +973,22 @@ class App extends React.Component {
                     path="/searchall"
                     component={Components.SearchAll}
                   />
+                  <Route
+                    exact
+                    path="/searchall_modified"
+                    component={Components.SearchAll_modified}
+                  />
+                  <Route
+                    exact
+                    path="/searchall_iv2"
+                    component={Components.SearchAll_iv2}
+                  />
+                  <Route
+                    exact
+                    path="/searchall_iv3"
+                    component={Components.SearchAll_iv3}
+                  />
+                  
                   <Route exact path="/about" component={Components.About} />
                   <Route exact path="/driver" component={Components.Driver} />
                   <Route
