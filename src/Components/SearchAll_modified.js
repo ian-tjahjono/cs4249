@@ -33,6 +33,24 @@ const analytics = firebase.analytics();
 const distSplit=2;
 //IV3 End
 
+//send event to log
+function sendEvent(eventName) {
+  //console.log('sendCustomEvent');
+  document.dispatchEvent(new CustomEvent('myevent', {detail: {
+    eventName: eventName,
+    info: {'key1': 'val1', 'key2': 'val2'}
+  }}));
+}
+
+function sendEventBylogging(eventName) {
+  //console.log('sendCustomeEventByLogging');
+  loggingjs.logEvent(null, 'myevent', {
+    eventName: eventName,
+    info: {'key1': 'val1', 'key2': 'val2'}
+  });
+}
+//send end
+
 function getMobileOperatingSystem() {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
@@ -71,6 +89,7 @@ function ScrollTop(props) {
   });
 
   const handleClick = (event) => {
+    sendEvent(event.name);
     const anchor = (event.target.ownerDocument || document).querySelectorAll(
       "#back-to-top-anchor"
     )[0];
@@ -284,6 +303,7 @@ export class SearchAll extends React.Component {
   };
 
   handleClose = (event) => {
+    sendEventBylogging(event.name);
     event.preventDefault();
     this.setState({ open: false });
   };
@@ -331,6 +351,7 @@ export class SearchAll extends React.Component {
   }
 
   handleChange = async (event) => {
+    sendEvent(event.name);
     const {
       target: { value, name },
     } = event;
@@ -359,6 +380,7 @@ export class SearchAll extends React.Component {
   };
 
   handleToggle = async (event) => {
+    sendEventBylogging(event.name);
     var name = event.currentTarget.name;
     if (name === "delivery") this.setState({ delivery: true, pickup: false });
     if (name === "pickup") this.setState({ delivery: false, pickup: true });
@@ -829,5 +851,6 @@ export class SearchAll extends React.Component {
     );
   }
 }
+document.addEventListener('myevent', loggingjs.logEvent, true);
 SearchAll.contextType = LanguageContext;
 export default SearchAll;
