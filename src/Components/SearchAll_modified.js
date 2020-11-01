@@ -27,11 +27,20 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import Skeleton from "@material-ui/lab/Skeleton";
 
-const analytics = firebase.analytics();
-
 //IV3
+import gradient from "../assets/gradient.png";
 var distSplit=2;
+const itemPerLine=Math.max(
+    document.body.scrollWidth,
+    document.documentElement.scrollWidth,
+    document.body.offsetWidth,
+    document.documentElement.offsetWidth,
+    document.documentElement.clientWidth
+  )/250;
+const numOfGroups=20;
 //IV3 End
+
+const analytics = firebase.analytics();
 
 function getMobileOperatingSystem() {
   var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -137,6 +146,8 @@ export class SearchAll extends React.Component {
 
     const queryParams = new URLSearchParams(props.location.search);
 	this.myRef = React.createRef();
+	
+
 
 	//IV3
 	const state = {
@@ -144,7 +155,7 @@ export class SearchAll extends React.Component {
       pickup: queryParams.get("option") === "selfcollect",
       delivery: queryParams.get("option") === "delivery",
       open: true,
-	  showList:[],   
+	  showList:[],
     };
 
     if (queryParams.get("lng") && queryParams.get("lat")) {
@@ -156,14 +167,14 @@ export class SearchAll extends React.Component {
       state.postal = queryParams.get("postal");
       state.searchPostal = true;
     }
-      
-    if (queryParams.get("iv3") === "short") {
+	
+	if (queryParams.get("iv3") === "short") {
         distSplit = 2;
     } else if (queryParams.get("iv3") === "long") {
         distSplit = 3;
     }  
-      
-	state.showList=new Array(20).fill(false)
+	
+	state.showList=new Array(numOfGroups).fill(false);
 
     this.state = state;
 	//IV3 End
@@ -389,14 +400,14 @@ export class SearchAll extends React.Component {
   
   wantToView = ev => {
 	let distCounter=ev.currentTarget.dataset.tag;
-    this.scrollToMyRef();
+	
+    //this.scrollToMyRef();
 	let toShow = [this.state.showList];
     if (this.state.showList[distCounter]) {
       toShow = false;
     } else {
       toShow = true;
     }
-	
 	this.setState(update(this.state, {
 	  showList: {
 		[distCounter]: {
@@ -473,35 +484,73 @@ export class SearchAll extends React.Component {
         });
 
 		//IV3: Food listing arrangement
-		let distCounter=0;
+		let distCounter=1;
+		let groupCounter=0;
+		let looped=0;
+		let groupSizes = new Array(numOfGroups).fill(0);
 		let size=Object.keys(filtered).length;
+		
         filtered = filtered.sort((a, b) => a.distance - b.distance);
+		
+		
+		//get each group's size	
+		filtered.forEach((data) => {
+			if(data["distance"]>=(distSplit*distCounter))
+			{
+				let difference = Math.floor(data["distance"]/distSplit) - distCounter;
+				if(difference > 0)
+				{
+					distCounter = difference;	
+				}
+				groupSizes[distCounter-1]=groupCounter;
+				distCounter++;
+				groupCounter=0;
+			}
+			groupCounter++;
+			looped++;
+		});
+		groupSizes[distCounter-1]=groupCounter;
+		
+		
+		//reset to loop again
+		distCounter=0;
+		groupCounter=0;
         result.nearby = filtered.map((data) => {
 			let division="";
 			let endDiv="";
 			let itemDiv="";
+			let	overlay = "";
 			
+			if(!this.state.showList[distCounter] && groupSizes[distCounter]>itemPerLine)
+			{
+				console.log((distCounter)+"="+groupSizes[distCounter]);
+				let overlayid="overlay_"+distCounter;
+				overlay = <span id={overlayid} style={{ height: "0px" }}>
+					  <img
+						src={gradient}
+						alt=""
+						style={{
+						  width: "130%",
+						  height: "150px",
+						  borderRadius: "5px",
+						  position: "relative",
+						  top: "150px",
+						  zIndex: "50",
+						}}
+					  />
+					</span>;
+			}
 			
-			let divider = <div class="w-100"><p class="text-left" style={{ paddingLeft:"27px" }}>{distSplit*distCounter} to {distSplit*(distCounter+1)} KM Away</p><hr
-					style={{
-					  color: "grey",
-					  backgroundColor: "grey",
-					  height: "1px",
-					  borderColor: "grey",
-					  width: "100%",
-					  alignItems: "center",
-					  marginBottom: "0px", // aligns See More to divider
-					}}
-				  /></div>;
+
 			/* See more button shows if only customer hasn't clicked see more */
 			let hider = 
-                <div class="w-100" style={{ marginTop: "30px" }}>
+                <div class="w-100" style={{ marginTop: "25px" , marginBottom: "30px" }}>
 				  <hr
 					style={{
-					  color: "grey",
-					  backgroundColor: "grey",
+					  color: "lightgrey",
+					  backgroundColor: "lightgrey",
 					  height: "1px",
-					  borderColor: "grey",
+					  borderColor: "lightgrey",
 					  width: "100%",
 					  alignItems: "center",
 					  marginBottom: "0px", // aligns See More to divider
@@ -515,47 +564,89 @@ export class SearchAll extends React.Component {
 					  cursor: "pointer",
 					  color: "grey",
 					}}
-					data-tag={distCounter}
+					data-tag={distCounter-1}
 					onClick={this.wantToView}
 				  >
-					{!this.state.showList[distCounter] ? <b>see more ↓</b> : <b>see less ↑</b>}
+					{!this.state.showList[distCounter-1] ? <b>see more ↓</b> : <b>see less ↑</b>}
+				  </div>
+				</div>;
+				
+			let fixedHider = 
+                <div class="w-100" style={{marginTop: "25px" , marginBottom: "30px" }}>
+				  <hr
+					style={{
+					  color: "lightgrey",
+					  backgroundColor: "lightgrey",
+					  height: "1px",
+					  borderColor: "lightgrey",
+					  width: "100%",
+					  alignItems: "center",
+					  marginBottom: "0px", // aligns See More to divider
+					}}
+				  />
+				  <div
+					style={{
+					  textAlign: "center",
+					  paddingRight: "15px",
+					  fontSize: "110%",
+					  cursor: "pointer",
+					  color: "grey",
+					}}
+					data-tag={distCounter-1}
+				  >
 				  </div>
 				</div>;
 			
-			if(data["distance"]<(distSplit*distCounter)){
-				division="";
-			}
-			else
+			let divider = <div class="w-100"><b><p class="text-left" style={{ paddingLeft:"27px" }}>{distSplit*distCounter} to {distSplit*(distCounter+1)} KM Away</p></b></div>;
+			
+			
+			//if end of group add division
+			if(data["distance"]>=(distSplit*distCounter))
 			{
-				
 				let difference = Math.floor(data["distance"]/distSplit) - distCounter;
 				if(difference > 0)
 				{
 					distCounter = difference;	
 				}
-
-				if(distCounter>0)
+				
+				//each time a new group check if not first group to add hider
+				if(distCounter>0 && groupCounter>itemPerLine)
 				{
-					division=<>{hider}{divider}</>;
+					division=<>{hider}{divider}{overlay}</>;
 				}
-				else
+				else if(distCounter>0 && groupCounter<=itemPerLine)
 				{
-					division=divider;
+					division=<>{fixedHider}{divider}{overlay}</>;
+				} 
+				else //1st group
+				{
+					division=<>{divider}{overlay}</>;
 				}
 				distCounter++;
+				groupCounter=0;
 
 			}
+			
+			//add final hider
 			if(size>1)
 			{
 				size--;
 			}
-			else
+			else if(groupCounter>itemPerLine)
 			{
 				endDiv=hider;
 			}
-			
-			if(this.state.showList[distCounter])
+			else
 			{
+				endDiv=fixedHider;
+			}
+
+		
+		
+			//show or hide items
+			if(this.state.showList[distCounter-1] || groupCounter<itemPerLine)
+			{
+				groupCounter++;
 				itemDiv=<span>
 					  <div>
 						<Item
@@ -571,13 +662,19 @@ export class SearchAll extends React.Component {
 					  </div>
 					</span>;
 			}
-			  return (
-				<>
-					{division}
-					{itemDiv}
-					{endDiv}					
-				</>
-			  );
+			else
+			{
+				groupCounter++;
+			}
+			
+			
+		  return (
+			<>
+				{division}
+				{itemDiv}
+				{endDiv}					
+			</>
+		  );
 			
         });
 		//IV3 End
@@ -602,6 +699,7 @@ export class SearchAll extends React.Component {
         });
       }
     }
+	
 	//IV2: Type of search pane
     return (
       <div class="container" style={{ paddingTop: "56px", width: "100%" }}>

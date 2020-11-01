@@ -816,7 +816,7 @@ figcaption .sub-price {
 
 .search-bar {
 	position: fixed;
-	z-index: 2 ;
+	z-index: 999 ;
 	border-width:10px;
 }
 
